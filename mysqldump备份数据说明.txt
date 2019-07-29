@@ -1,0 +1,19 @@
+mysqldump命令用法说明：
+Usage: mysqldump [OPTIONS] database [tables]
+OR     mysqldump [OPTIONS] --databases [OPTIONS] DB1 [DB2 DB3...]
+OR     mysqldump [OPTIONS] --all-databases [OPTIONS]
+For more options, use mysqldump --help
+
+举例：
+
+备份全部数据库：
+mysqldump -uroot -p --all-databases > filename
+
+备份指定数据库：
+mysqldump -uroot -p --databases db1 db2 > filename
+
+备份指定一个数据库的表：
+mysqldump -uroot -p dbname tblname1 tblname2 > filename
+
+开启binlog时最常用的选项（完全备份包括存储过程和触发器）：
+mysqldump -uroot -p -hxx.xx.xx.xx --all-databases --master-data=2 --single-transaction --flush-logs --routines --triggers> c:\all-db.sql

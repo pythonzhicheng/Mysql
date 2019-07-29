@@ -1,0 +1,122 @@
+创建用户
+
+mysql> create user ma@localhost identified by 'ma';
+mysql> select user,host,authentication_string from mysql.user;
+mysql> show grants for ma@localhost;
+
+
+用户改名
+
+mysql> rename user ma@localhost to 'ma'@'%';
+mysql> select user,host,authentication_string from mysql.user;
+mysql> show grants for ma@localhost;
+
+
+创建用户同时授权
+
+mysql> grant select,insert,update,delete on demo.* to 'liu'@'%' identified by 'liu'; 
+mysql> select user,host,authentication_string from mysql.user;
+mysql> show grants for 'liu'@'%';
+
+查看当前用户权限
+mysql> show grants;
+查看指定用户权限
+mysql> show grants for 'liu'@'%';
+
+
+撤销权限
+
+mysql> revoke select,insert,update,delete on demo.* from 'liu'@'%';
+
+删除用户
+
+mysql> drop user 'liu'@'%';
+
+
+全局级授权
+mysql> grant select,update,insert,delete on *.* to 'ma'@'%';
+mysql> select * from mysql.user where user='ma'\G
+mysql> show grants for 'ma'@'%'; 
+mysql> revoke select,update,insert,delete on *.* from 'ma'@'%'; 
+mysql> show grants for 'ma'@'%'; 
+
+
+数据库级授权
+mysql> grant select,update,insert,delete on demo.* to 'ma'@'%';
+mysql> select * from mysql.db where user='ma'\G
+mysql> show grants for 'ma'@'%'; 
+mysql> revoke select,update,insert,delete on demo.* from 'ma'@'%'; 
+
+表级授权
+mysql> grant select,update,insert,delete on demo.stu to 'ma'@'%';
+mysql> select * from mysql.tables_priv where user='ma'\G
+mysql> show grants for 'ma'@'%'; 
+mysql> revoke select,update,insert,delete on demo.stu from 'ma'@'%'; 
+
+列级授权
+mysql> grant select(sname,score),update(sex) on demo.stu to 'ma'@'%';
+mysql> select * from mysql.columns_priv where user='ma'\G
+mysql> show grants for 'ma'@'%'; 
+mysql> revoke select(sname,score),update(sex) on demo.stu from 'ma'@'%';
+
+
+
+创建索引：
+
+①创建表的时候指定   
+create table t1(id int,name char(10), index idx_name(name), qq varchar(20));
+
+②修改表的时候添加或删除索引   
+alter table t1 add index idx_name(name);  
+
+③单独创建索引  
+create index  idx_qq on t1(qq);
+
+查看索引
+show keys from t1;
+
+
+删除索引      
+show create table t1;
+drop index  idx_qq on t1;  
+或
+alter table t1 drop index idx_qq;
+
+
+查看索引
+show keys from t1;
+
+
+查看查询语句是否使用了索引
+select语句前面加上explain
+
+
+创建外键约束
+1.先建立所引用的主键约束
+alter table class add primary key(cno);
+2.创建依赖于表class列cno的外键
+alter table stu add foreign key(cno) references class(cno);
+
+
+查看外键名称
+show create table stu\G
+或
+select * from information_schema.KEY_COLUMN_USAGE t where t.REFERENCED_TABLE_NAME is not null
+
+删除外键
+alter table stu drop foreign key 外键名称;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

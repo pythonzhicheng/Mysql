@@ -1,0 +1,36 @@
+事务隔离性
+
+会话1：
+
+use demo;
+begin;
+insert into class1 values(6,'a','xxx');
+insert into class1 values(6,'a','xxx');
+update class1 set cno=cno+100;
+
+
+
+会话2：
+
+use demo;
+--查看是否有事务
+select count(*) from information_schema.innodb_trx;
+select * from class1;
+
+
+
+会话1：
+commit;
+
+会话2：
+--查看是否有事务
+select count(*) from information_schema.innodb_trx;
+select * from class1;
+
+
+
+
+
+
+
+

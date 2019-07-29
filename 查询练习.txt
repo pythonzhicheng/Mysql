@@ -1,0 +1,101 @@
+select col1,col2,.....   from tblname where col1=xxx group by col1 having col1=xxx order by col1 limit N
+            3                     1      2               4            5               6             7
+
+
+#在stu表中按照班号cno去重
+select distinct cno from stu where cno is not null;
+#在stu表中按照性别sex去重
+select distinct sex from stu;
+
+#在stu表中按照班号cno和性别sex去重
+select distinct cno,sex from stu;
+
+#1,2,3班中，95后男生，考分超过600的同学，按照班号和考分倒序排序（3种写法）
+select * from stu where (cno=1 or cno=2 or cno=3) and birth>='1995-1-1' and sex='男' and score>600 order by cno,score desc;
+select * from stu where cno in (1,2,3) and birth>='1995-1-1' and sex='男' and score>600 order by cno,score desc;
+select * from stu where cno between 1 and 3 and birth>='1995-1-1' and sex='男' and score>600 order by cno,score desc;
+
+#count用法
+select count(*),count(sno),count(1),count(cno) from stu;
+#sum
+root@10.10.21.103[demo]>select avg(sname),sum(sname) from stu;
++------------+------------+
+| avg(sname) | sum(sname) |
++------------+------------+
+|          0 |          0 |
++------------+------------+
+1 row in set, 40 warnings (0.00 sec)
+# min max
+root@10.10.21.103[demo]>select max(convert(sname using gbk)),min(convert(sname using gbk)) from stu;
++-------------------------------+-------------------------------+
+| max(convert(sname using gbk)) | min(convert(sname using gbk)) |
++-------------------------------+-------------------------------+
+| 诸葛亮                        | 曹洪                          |
++-------------------------------+-------------------------------+
+1 row in set (0.00 sec)
+
+
+#统计有班的男同学，最高分，最低分，最胖，最瘦
+select max(score),min(score),max(weight),min(weight) from stu where cno is not null and sex='男'
+select group_concat(sname,'体重：',weight,'考分：',score),max(score),min(score),max(weight),min(weight) from stu where cno is not null and sex='男';
+
+*按照班号分组统计平均身高：
+select cno,avg(height) from stu group by cno;
+*按照性别分组统计身高：
+select sex,avg(height) from stu group by sex;
+*按照班级分组，再按照性别分组，统计高考分数：
+select cno,sex,max(score)  from stu where cno is not null group by cno,sex order by cno,sex desc
+*按照出生年份统计体重信息：
+select year(birth) 年份,count(*),group_concat(sname,birth) from stu group by year(birth);
+*按照出生月份统计体重信息：
+select month(birth) 月份,count(*),group_concat(sname,birth) from stu group by month(birth);
+
+
+
+#测试查询执行时间
+mysqlslap -uroot -p --create-schema=demo --query="select cno,avg(height) from stu where cno=1;"  -h10.10.21.103 -i 1 --concurrency=100  --number-of-queries=5000
+mysqlslap -uroot -p --create-schema=demo --query="select cno,avg(height) from stu group by cno having cno=1;"  -h10.10.21.103 -i 1 --concurrency=100  --number-of-queries=5000
+
+
+多表连接查询
+	* 交叉连接
+		select * from a join b;
+		select * from a cross join b;		
+
+	* 等值连接
+		* 内连接 （显示2个表等值部分的数据）
+			select * from a join b on a.id=b.id;
+			select * from a inner join b on a.id=b.id;
+		* 左连接 （显示左表全部数据）
+			select * from a left join b on a.id=b.id;
+			select * from a left outer join b on a.id=b.id;
+		* 右连接 （显示右表全部数据）
+			select * from a right join b on a.id=b.id;
+			select * from a right outer join b on a.id=b.id;
+		* 全连接：
+			select * from a left join b on a.id=b.id
+			union
+			select * from a right join b on a.id=b.id;
+	* 非等值连接
+		东亚四强赛：中国，韩国，日本，朝鲜 team
+
+		单循环：
+			select * from team a join team b on a.id<b.id order by a.id;
+		双循环：
+			select * from team a join team b on a.id!=b.id order by a.id;
+
+
+	示例：
+	#显示有班的学生和其班级信息（内连接）
+	select * from stu s join class c on s.cno=c.cno;
+	#显示所有学生信息和对应班级信息（左连接）
+	select * from stu s left join class c on s.cno=c.cno;
+	#显示所有班级信息和对应的学生信息（右连接）
+	select * from stu s right join class c on s.cno=c.cno;
+	或
+	select * from class c left join stu s on c.cno=s.cno;
+
+	#显示所有学生和所有班级的相关信息（全连接）
+	select * from stu s left join class c on s.cno=c.cno 
+	union 
+	select * from stu s right join class c on s.cno=c.cno;

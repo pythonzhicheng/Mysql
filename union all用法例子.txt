@@ -1,0 +1,3 @@
+select ifnull(cno,'没班') 班号,count(*) 人数 from stu group by cno
+ union all 
+select '总计：',count(*) from stu;

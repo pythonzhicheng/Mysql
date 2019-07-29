@@ -1,0 +1,7 @@
+create table class1 as select * from class where cno=1;
+insert into class1 values(5,'5°à','¶­×¿');
+
+
+select * from class union select * from class1;
+select * from class union all select * from class1;
+

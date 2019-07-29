@@ -1,0 +1,33 @@
+字符型：
+	varchar(N)  N:1-65535
+	char(N)	    N:1-8000
+数值型：
+	int
+	decimal(M,N)
+
+日期型：日期格式：YYYY-MM-DD HH24:MI:SS 
+	date
+	datetime
+	timestamp
+ 
+修饰符：
+	not null
+	default 
+	unsigned
+	auto_increment primary key
+约束：
+	primary key  非空（null) + 唯一
+	unique	     可以为空，但是不能有重值
+
+DDL：建立数据库对象（库database，表table，索引index，视图view，过程，函数...
+	create,drop,alter
+DML: 增删该查 CRUD  create read update delete
+	insert delete update select
+DCL: grant revoke
+TCL
+	commit;rollback
+
+
+
+
+

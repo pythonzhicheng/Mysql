@@ -1,0 +1,1 @@
+mysql> set SQL_MODE='PAD_CHAR_TO_FULL_LENGTH';

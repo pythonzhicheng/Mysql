@@ -1,0 +1,48 @@
+select main.deptno,main.rownumber,main.sal,ano.sal as lagsal,ano.rownumber
+from
+(
+select
+tmp.deptno,
+tmp.sal,
+IF (@deptno = tmp.deptno,@rownumber:=@rownumber+ 1,@rownumber:= 1) AS rownumber,
+@deptno := tmp.deptno as dtno
+FROM
+(
+SELECT deptno,sal FROM emp
+ORDER BY deptno,sal
+) tmp,
+(SELECT @deptno := NULL,@rownumber:= 0) a
+) main left join 
+(
+select
+tmp.deptno,
+tmp.sal,
+IF (@deptno = tmp.deptno,@rownumber:=@rownumber+ 1,@rownumber:= 1) AS rownumber,
+@deptno := tmp.deptno as dtno
+FROM
+(
+SELECT deptno,sal FROM emp
+ORDER BY deptno,sal
+) tmp,
+(SELECT @deptno := NULL,@rownumber:= 0) a
+) ano
+on main.deptno=ano.deptno and ano.rownumber=main.rownumber-1
+
+
+#按照score排序，显示间隔分数差值
+select a.*,b.lagscore,(a.score-b.lagscore) 差值 from 
+(select s.*, (@rownum := @rownum +1) as rowno from stu s,(select @rownum:=0) r order by score) a left join
+
+(select s.score lagscore, (@rowno := @rowno +1) as rowno from stu s,(select @rowno:=1) r order by score) b 
+ on a.rowno=b.rowno
+ 
+
+
+#按照cno排序，再按照score排序，显示间隔分数差值
+
+select a.sno,a.sname,a.sex,a.birth,a.cno,a.score,if(a.cno=b.lagcno,b.lagscore,'') lagscore,if(a.cno=b.lagcno,a.score-b.lagscore,'') 差值 from 
+(select s.sno,s.sname,s.sex,s.birth,s.score,ifnull(s.cno,0) cno, (@rownum := @rownum +1) as rowno from stu s,(select @rownum:=0) r order by cno,score) a left join
+
+(select s.score lagscore, ifnull(s.cno,0) as lagcno, (@rowno := @rowno +1) as rowno from stu s,(select @rowno:=1) r order by cno,score) b 
+ on a.rowno=b.rowno
+ 
